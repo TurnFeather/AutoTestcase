@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+"""
+用例名称：系统配置操作日志删除
+用例级别：LEVEL1
+类型：FEATURE
+自动化：TRUE
+Enabled: TRUE
+父目录：bd
+产品：CS
+
+"""
+from . import *
+
+step("1.设备的默认IP为192.168.0.2")
+print(devMng.get_ip())
+check(hopIp='10.10.10.1',devIp=devMng.get_ip())
+
+step("2.设置设备的IP地址为192.168.0.2")
+devMng.set_ip(ip='192.168.0.2')
+
+step("3.设备IP设置成功")
+check(hope='192.168.0.2',ac=devMng.get_ip())
