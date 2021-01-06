@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+from .testsuite import *
+'''
+一级目录：业务接入
+二级目录：二层业务
+三级目录：MAC转发表
+用例名称：1d网桥验证主站空口隔离功能
+用例编号：3102010
+用例级别：LEVEL2
+组网描述：L2Static,L2Dynamic
+组网约束：
+预置条件：1、网元正常启动
+2、正确建立配置连接(网管、WebUI或者命令行)
+3、空口链路和LAN链路正常连通
+4、组网中一个主站和至少两个端站，端站之间未建立连接
+测试步骤：1、配置网络模式为交换模式,配置网桥模式为1d网桥
+2、在其中一个端站的LAN口发送广播和未知单播业务【check1】
+3、在其中一个端站的LAN口发送组播业务报文【check2】
+4、在端站1的LAN口发送组播协议报文，在端站的LAN口查看报文【check3】
+预期结果：【check1】在主站侧的LAN口和另外一个端站的LAN口都可以收到该报文
+【check2】在发送业务端站的其他LAN口、主站的LAN口可以收到组播业务报文，其他端站的LAN口收不到组播业务报文
+【check3】在端站1的其他LAN口、主站侧的所有LAN口、端站2的所有LAN口均可以收到组播协议报文，且没有多包
+适用版本：V1R1C00
+测试类型：功能测试
+设备类型：E3000,E600,E500,E300
+单板类型：
+关键词：二层业务
+需求编号：
+是否自动化：是
+备注：
+'''
+
+step('预置条件')
+step('1、网元正常启动')
+step('2、正确建立配置连接(网管、WebUI或者命令行)')
+step('3、空口链路和LAN链路正常连通')
+step('4、组网中一个主站和至少两个端站，端站之间未建立连接')
+l2_srv.l2_srv_link_pre_cfg(C_To_R=2,R_SRV_PORT=[2])
+core_site_lan1 = l2_srv.core_site_srv_port[0]
+rcst1_lan1 = l2_srv.rcst_srv_port[0][0]
+rcst1_lan2 = l2_srv.rcst_srv_port[0][1]
+rcst2_lan1 = l2_srv.rcst_srv_port[1][0]
+
+step('测试步骤')
+step('1、配置网络模式为交换模式,配置网桥模式为1d网桥')
+l2_srv.set_bridge_mode(mode=L2_BRIDGE_MODE_1D)
+
+step('2、在其中一个端站的LAN口发送广播和未知单播业务【check1】')
+step('2.1 【check1】在主站侧的LAN口和另外一个端站的LAN口都可以收到该报文')
+l2_srv.l2_service_stream_test(transmitPort=[[rcst1_lan1],[core_site_lan1,rcst2_lan1]],
+                              stream_category=[BROCAST_STREAM,UNKNOWN_UNICAST_STREAM],
+                              loss=0)
+
+step('3、在其中一个端站的LAN口发送组播业务报文【check2】')
+step('3.1 【check2】在发送业务端站的其他LAN口、主站的LAN口可以收到组播业务报文，其他端站的LAN口收不到组播业务报文')
+l2_srv.l2_service_stream_test(transmitPort=[[rcst1_lan1],[rcst1_lan2,core_site_lan1,rcst2_lan1]],
+                              stream_category=[MULTICAST_STREAM_SRV],loss=[0,0,100],viewName='Port Statistics')
+
+step('4、在端站1的LAN口发送组播协议报文，在端站的LAN口查看报文【check3】')
+step('4.1 【check3】在端站1的其他LAN口、主站侧的所有LAN口、端站2的所有LAN口均可以收到组播协议报文，且没有多包')
+l2_srv.l2_service_stream_test(transmitPort=[[rcst1_lan1],[rcst1_lan2,core_site_lan1,rcst2_lan1]],
+                              stream_category=[MULTICAST_STREAM_PRO],loss=[0,0,0],viewName='Port Statistics')
+
+clean_up()
