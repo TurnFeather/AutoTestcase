@@ -5,7 +5,7 @@
 类型：FEATURE
 自动化：TRUE
 Enabled: TRUE
-父目录：bd
+目录：jc/bd
 产品：CS
 
 """
@@ -20,3 +20,5 @@ devMng.set_ip(ip='192.168.0.2')
 
 step("3.设备IP设置成功")
 check(hope='192.168.0.2',ac=devMng.get_ip())
+
+//哈哈哈，这是我的更新操作
