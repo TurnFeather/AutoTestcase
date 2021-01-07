@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .testsuite import *
-'''
+"""
 一级目录：业务接入
 二级目录：二层业务
 三级目录：MAC转发表
@@ -28,7 +28,7 @@ from .testsuite import *
 需求编号：
 是否自动化：是
 备注：
-'''
+"""
 
 step('预置条件')
 step('1、网元正常启动')
